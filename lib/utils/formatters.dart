@@ -13,6 +13,21 @@ const List<String> _monthNames = [
   'Dec',
 ];
 
+const List<String> _fullMonthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
 /// Formats a numeric value as a USD currency string (e.g. `$120.00`).
 String money(double value) => '\$${value.toStringAsFixed(2)}';
 
@@ -23,6 +38,10 @@ String formatShortDate(DateTime date) =>
 /// Formats a [DateTime] as `Mon D, YYYY` (e.g. `Nov 8, 2026`).
 String formatFullDate(DateTime date) =>
     '${_monthNames[date.month - 1]} ${date.day}, ${date.year}';
+
+/// Formats a [DateTime] as `Month YYYY` (e.g. `November 2026`).
+String formatMonthYear(DateTime date) =>
+    '${_fullMonthNames[date.month - 1]} ${date.year}';
 
 /// Formats the time portion of a [DateTime] in 12-hour format (e.g. `2:05 PM`).
 String formatTime(DateTime date) {

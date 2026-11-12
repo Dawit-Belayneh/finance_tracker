@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../data/categories.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 
@@ -12,34 +13,16 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  static const List<String> _expenseCategories = [
-    'Food',
-    'Transport',
-    'Bills',
-    'Shopping',
-    'Entertainment',
-    'Health',
-    'Other',
-  ];
-
-  static const List<String> _incomeCategories = [
-    'Salary',
-    'Freelance',
-    'Investments',
-    'Gift',
-    'Other',
-  ];
-
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
 
   bool _isExpense = true;
-  String _category = _expenseCategories.first;
+  String _category = expenseCategories.first;
   DateTime _selectedDate = DateTime.now();
 
   List<String> get _availableCategories =>
-      _isExpense ? _expenseCategories : _incomeCategories;
+      _isExpense ? expenseCategories : incomeCategories;
 
   @override
   void dispose() {

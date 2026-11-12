@@ -50,4 +50,30 @@ void main() {
     expect(find.byKey(const Key('transaction_search_field')), findsOneWidget);
     expect(find.text('9 transactions'), findsOneWidget);
   });
+
+  testWidgets('Budgets tab updates spending progress when new expense is added',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const FinanceTrackerApp());
+
+    // Open Add Transaction and add a $100 Food expense.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('amount_field')), '100');
+    await tester.enterText(
+      find.byKey(const Key('description_field')),
+      'Dinner',
+    );
+    await tester.tap(find.byKey(const Key('save_transaction_button')));
+    await tester.pumpAndSettle();
+
+    // Switch to Budgets tab.
+    await tester.tap(find.text('Budgets'));
+    await tester.pumpAndSettle();
+
+    // Sample monthly spending is $530 + $100 = $630 of $2000.
+    expect(find.text('\$630.00 / \$2000.00'), findsOneWidget);
+    // Sample Food spending is $200 + $100 = $300 of $300.
+    expect(find.text('\$300.00 / \$300.00'), findsOneWidget);
+  });
 }
