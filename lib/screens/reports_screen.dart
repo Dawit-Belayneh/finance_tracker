@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
+import '../widgets/settings_action.dart';
 
 /// Time granularity for financial reports.
 enum ReportPeriod { weekly, monthly }
@@ -14,10 +15,12 @@ class ReportsScreen extends StatefulWidget {
     super.key,
     required this.transactions,
     this.initialDate,
+    this.onOpenSettings,
   });
 
   final List<Transaction> transactions;
   final DateTime? initialDate;
+  final VoidCallback? onOpenSettings;
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
@@ -197,6 +200,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       appBar: AppBar(
         title: const Text('Reports'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: buildSettingsActions(widget.onOpenSettings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

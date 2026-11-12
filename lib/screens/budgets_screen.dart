@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../data/categories.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
+import '../widgets/settings_action.dart';
 
 /// Displays monthly and per-category budgets along with spending progress.
 class BudgetsScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class BudgetsScreen extends StatefulWidget {
     this.onCategoryBudgetSaved,
     this.onCategoryBudgetRemoved,
     this.initialMonth,
+    this.onOpenSettings,
   });
 
   final List<Transaction> transactions;
@@ -24,6 +26,7 @@ class BudgetsScreen extends StatefulWidget {
   final void Function(String category, double amount)? onCategoryBudgetSaved;
   final ValueChanged<String>? onCategoryBudgetRemoved;
   final DateTime? initialMonth;
+  final VoidCallback? onOpenSettings;
 
   @override
   State<BudgetsScreen> createState() => _BudgetsScreenState();
@@ -150,6 +153,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       appBar: AppBar(
         title: const Text('Budgets'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: buildSettingsActions(widget.onOpenSettings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -541,10 +545,10 @@ class _BudgetDialogState extends State<_BudgetDialog> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Monthly limit',
-                prefixText: '\$ ',
-                border: OutlineInputBorder(),
+                prefixText: '$activeCurrencySymbol ',
+                border: const OutlineInputBorder(),
               ),
               validator: _validateAmount,
             ),

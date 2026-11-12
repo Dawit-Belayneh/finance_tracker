@@ -28,8 +28,15 @@ const List<String> _fullMonthNames = [
   'December',
 ];
 
-/// Formats a numeric value as a USD currency string (e.g. `$120.00`).
-String money(double value) => '\$${value.toStringAsFixed(2)}';
+/// Global active currency symbol used by [money].
+String activeCurrencySymbol = '\$';
+
+/// Whether [money] formats values with two decimal places.
+bool activeShowDecimals = true;
+
+/// Formats a numeric value using the active currency symbol (e.g. `$120.00`).
+String money(double value) =>
+    '$activeCurrencySymbol${value.toStringAsFixed(activeShowDecimals ? 2 : 0)}';
 
 /// Formats a [DateTime] as `D/M/YYYY`.
 String formatShortDate(DateTime date) =>

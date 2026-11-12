@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 import '../utils/transaction_actions.dart';
+import '../widgets/settings_action.dart';
 import '../widgets/transaction_tile.dart';
 import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
@@ -17,6 +18,7 @@ class TransactionsScreen extends StatefulWidget {
     this.onTransactionAdded,
     this.onTransactionUpdated,
     this.onTransactionDeleted,
+    this.onOpenSettings,
   });
 
   final List<Transaction> transactions;
@@ -24,6 +26,7 @@ class TransactionsScreen extends StatefulWidget {
   final void Function(Transaction original, Transaction updated)?
       onTransactionUpdated;
   final ValueChanged<Transaction>? onTransactionDeleted;
+  final VoidCallback? onOpenSettings;
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
@@ -137,6 +140,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       appBar: AppBar(
         title: const Text('Transactions'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: buildSettingsActions(widget.onOpenSettings),
       ),
       body: Column(
         children: [

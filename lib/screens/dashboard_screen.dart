@@ -4,6 +4,7 @@ import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 import '../utils/transaction_actions.dart';
+import '../widgets/settings_action.dart';
 import '../widgets/transaction_tile.dart';
 import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
@@ -17,6 +18,7 @@ class DashboardScreen extends StatefulWidget {
     this.onTransactionUpdated,
     this.onTransactionDeleted,
     this.onSeeAllTransactions,
+    this.onOpenSettings,
   });
 
   final List<Transaction>? transactions;
@@ -25,6 +27,7 @@ class DashboardScreen extends StatefulWidget {
       onTransactionUpdated;
   final ValueChanged<Transaction>? onTransactionDeleted;
   final VoidCallback? onSeeAllTransactions;
+  final VoidCallback? onOpenSettings;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -144,6 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Dashboard'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: buildSettingsActions(widget.onOpenSettings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

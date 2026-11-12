@@ -153,11 +153,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Amount',
                 hintText: '0.00',
-                prefixText: '\$ ',
-                border: OutlineInputBorder(),
+                prefixText: '$activeCurrencySymbol ',
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 final text = value?.trim() ?? '';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/app_settings.dart';
 import '../data/sample_budgets.dart';
 import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
@@ -6,20 +7,25 @@ import '../utils/transaction_actions.dart';
 import 'budgets_screen.dart';
 import 'dashboard_screen.dart';
 import 'reports_screen.dart';
+import 'settings_screen.dart';
 import 'transactions_screen.dart';
 
-/// Top-level navigation shell hosting Dashboard, Transactions, and Budgets.
+/// Top-level navigation shell hosting Dashboard, Transactions, Budgets, and Reports.
 class HomeShell extends StatefulWidget {
   const HomeShell({
     super.key,
     this.initialTransactions,
     this.initialMonthlyBudget = defaultMonthlyBudget,
     this.initialCategoryBudgets,
+    this.settings = const AppSettings(),
+    this.onSettingsChanged,
   });
 
   final List<Transaction>? initialTransactions;
   final double initialMonthlyBudget;
   final Map<String, double>? initialCategoryBudgets;
+  final AppSettings settings;
+  final ValueChanged<AppSettings>? onSettingsChanged;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -77,6 +83,19 @@ class _HomeShellState extends State<HomeShell> {
     });
   }
 
+  void _openSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SettingsScreen(
+          settings: widget.settings,
+          onSettingsChanged: (updated) {
+            widget.onSettingsChanged?.call(updated);
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,12 +108,14 @@ class _HomeShellState extends State<HomeShell> {
             onTransactionUpdated: _updateTransaction,
             onTransactionDeleted: _deleteTransaction,
             onSeeAllTransactions: () => setState(() => _selectedIndex = 1),
+            onOpenSettings: _openSettings,
           ),
           TransactionsScreen(
             transactions: _transactions,
             onTransactionAdded: _addTransaction,
             onTransactionUpdated: _updateTransaction,
             onTransactionDeleted: _deleteTransaction,
+            onOpenSettings: _openSettings,
           ),
           BudgetsScreen(
             transactions: _transactions,
@@ -103,8 +124,12 @@ class _HomeShellState extends State<HomeShell> {
             onMonthlyBudgetChanged: _updateMonthlyBudget,
             onCategoryBudgetSaved: _saveCategoryBudget,
             onCategoryBudgetRemoved: _removeCategoryBudget,
+            onOpenSettings: _openSettings,
           ),
-          ReportsScreen(transactions: _transactions),
+          ReportsScreen(
+            transactions: _transactions,
+            onOpenSettings: _openSettings,
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(

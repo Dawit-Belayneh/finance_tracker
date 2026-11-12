@@ -132,4 +132,41 @@ void main() {
     expect(find.text('Bistro dinner'), findsNothing);
     expect(find.text('Restaurant'), findsNothing);
   });
+
+  testWidgets('Settings changes currency, decimals, and theme across the app',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const FinanceTrackerApp());
+
+    // Open Settings from Dashboard AppBar.
+    await tester.tap(find.byTooltip('Settings').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsOneWidget);
+
+    // Switch Currency to Euro.
+    await tester.tap(find.byKey(const Key('currency_setting_tile')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Euro'));
+    await tester.pumpAndSettle();
+
+    // Switch Theme to Dark.
+    await tester.tap(find.text('Dark'));
+    await tester.pumpAndSettle();
+
+    // Turn off decimals.
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('show_decimals_switch')));
+    await tester.pumpAndSettle();
+
+    // Return to Dashboard and verify dark theme + Euro formatting without decimals.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    final materialApp =
+        tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(materialApp.themeMode, ThemeMode.dark);
+    expect(find.textContaining('€'), findsWidgets);
+    expect(find.textContaining('.00'), findsNothing);
+  });
 }
