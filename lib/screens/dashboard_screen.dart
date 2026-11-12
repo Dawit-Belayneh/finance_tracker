@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
+import '../utils/transaction_actions.dart';
 import '../widgets/transaction_tile.dart';
 import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
@@ -13,11 +14,16 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     this.transactions,
     this.onTransactionAdded,
+    this.onTransactionUpdated,
+    this.onTransactionDeleted,
     this.onSeeAllTransactions,
   });
 
   final List<Transaction>? transactions;
   final ValueChanged<Transaction>? onTransactionAdded;
+  final void Function(Transaction original, Transaction updated)?
+      onTransactionUpdated;
+  final ValueChanged<Transaction>? onTransactionDeleted;
   final VoidCallback? onSeeAllTransactions;
 
   @override
@@ -80,15 +86,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
           transactions: transactions,
           onTransactionAdded: widget.onTransactionAdded ??
               (t) => setState(() => _localTransactions.add(t)),
+          onTransactionUpdated: widget.onTransactionUpdated ??
+              (original, updated) => setState(
+                    () => replaceTransactionInList(
+                      _localTransactions,
+                      original,
+                      updated,
+                    ),
+                  ),
+          onTransactionDeleted: widget.onTransactionDeleted ??
+              (target) => setState(
+                    () => removeTransactionFromList(_localTransactions, target),
+                  ),
         ),
       ),
     );
   }
 
   void _openDetails(Transaction transaction) {
+    var current = transaction;
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => TransactionDetailScreen(transaction: transaction),
+        builder: (_) => TransactionDetailScreen(
+          transaction: transaction,
+          onTransactionUpdated: (updated) {
+            final previous = current;
+            current = updated;
+            if (widget.onTransactionUpdated != null) {
+              widget.onTransactionUpdated!(previous, updated);
+            } else {
+              setState(
+                () => replaceTransactionInList(
+                  _localTransactions,
+                  previous,
+                  updated,
+                ),
+              );
+            }
+          },
+          onTransactionDeleted: () {
+            if (widget.onTransactionDeleted != null) {
+              widget.onTransactionDeleted!(current);
+            } else {
+              setState(
+                () => removeTransactionFromList(_localTransactions, current),
+              );
+            }
+          },
+        ),
       ),
     );
   }

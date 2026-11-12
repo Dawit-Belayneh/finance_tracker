@@ -96,4 +96,40 @@ void main() {
     );
     expect(breakdownFinder, findsOneWidget);
   });
+
+  testWidgets('Editing and deleting a transaction from Transactions updates list',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const FinanceTrackerApp());
+
+    await tester.tap(find.text('Transactions'));
+    await tester.pumpAndSettle();
+    expect(find.text('9 transactions'), findsOneWidget);
+
+    // Open Restaurant details (near top of newest-first list) and edit it.
+    await tester.tap(find.text('Restaurant'));
+    await tester.pumpAndSettle();
+
+    final editButton = find.byKey(const Key('edit_transaction_button'));
+    await tester.tap(editButton);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('description_field')),
+      'Bistro dinner',
+    );
+    await tester.tap(find.byKey(const Key('save_transaction_button')));
+    await tester.pumpAndSettle();
+
+    // Now delete the edited transaction.
+    final deleteButton = find.byKey(const Key('delete_transaction_button'));
+    await tester.tap(deleteButton);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('confirm_delete_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('8 transactions'), findsOneWidget);
+    expect(find.text('Bistro dinner'), findsNothing);
+    expect(find.text('Restaurant'), findsNothing);
+  });
 }

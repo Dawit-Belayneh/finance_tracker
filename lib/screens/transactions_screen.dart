@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
+import '../utils/transaction_actions.dart';
 import '../widgets/transaction_tile.dart';
 import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
@@ -14,10 +15,15 @@ class TransactionsScreen extends StatefulWidget {
     super.key,
     required this.transactions,
     this.onTransactionAdded,
+    this.onTransactionUpdated,
+    this.onTransactionDeleted,
   });
 
   final List<Transaction> transactions;
   final ValueChanged<Transaction>? onTransactionAdded;
+  final void Function(Transaction original, Transaction updated)?
+      onTransactionUpdated;
+  final ValueChanged<Transaction>? onTransactionDeleted;
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
@@ -71,9 +77,36 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   void _openDetails(Transaction transaction) {
+    var current = transaction;
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => TransactionDetailScreen(transaction: transaction),
+        builder: (_) => TransactionDetailScreen(
+          transaction: transaction,
+          onTransactionUpdated: (updated) {
+            final previous = current;
+            current = updated;
+            if (widget.onTransactionUpdated != null) {
+              widget.onTransactionUpdated!(previous, updated);
+            } else {
+              setState(
+                () => replaceTransactionInList(
+                  widget.transactions,
+                  previous,
+                  updated,
+                ),
+              );
+            }
+          },
+          onTransactionDeleted: () {
+            if (widget.onTransactionDeleted != null) {
+              widget.onTransactionDeleted!(current);
+            } else {
+              setState(
+                () => removeTransactionFromList(widget.transactions, current),
+              );
+            }
+          },
+        ),
       ),
     );
   }

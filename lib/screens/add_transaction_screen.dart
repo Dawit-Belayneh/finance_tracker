@@ -4,9 +4,14 @@ import '../data/categories.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 
-/// Screen for creating a new income or expense [Transaction].
+/// Screen for creating or editing an income or expense [Transaction].
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  const AddTransactionScreen({
+    super.key,
+    this.initialTransaction,
+  });
+
+  final Transaction? initialTransaction;
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -14,15 +19,42 @@ class AddTransactionScreen extends StatefulWidget {
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late final TextEditingController _amountController;
+  late final TextEditingController _descriptionController;
 
-  bool _isExpense = true;
-  String _category = expenseCategories.first;
-  DateTime _selectedDate = DateTime.now();
+  late bool _isExpense;
+  late String _category;
+  late DateTime _selectedDate;
 
-  List<String> get _availableCategories =>
-      _isExpense ? expenseCategories : incomeCategories;
+  bool get _isEditing => widget.initialTransaction != null;
+
+  List<String> get _availableCategories {
+    final base = _isExpense ? expenseCategories : incomeCategories;
+    return <String>{...base, _category}.toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialTransaction;
+    if (initial != null) {
+      _isExpense = initial.isExpense;
+      _category = initial.category;
+      _selectedDate = initial.date;
+      _amountController = TextEditingController(
+        text: initial.amount.toStringAsFixed(2),
+      );
+      final initialDescription = initial.note ??
+          (initial.title == initial.category ? '' : initial.title);
+      _descriptionController = TextEditingController(text: initialDescription);
+    } else {
+      _isExpense = true;
+      _category = expenseCategories.first;
+      _selectedDate = DateTime.now();
+      _amountController = TextEditingController();
+      _descriptionController = TextEditingController();
+    }
+  }
 
   @override
   void dispose() {
@@ -35,7 +67,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (_isExpense == isExpense) return;
     setState(() {
       _isExpense = isExpense;
-      _category = _availableCategories.first;
+      final base = _isExpense ? expenseCategories : incomeCategories;
+      _category = base.first;
     });
   }
 
@@ -54,8 +87,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         picked.year,
         picked.month,
         picked.day,
-        now.hour,
-        now.minute,
+        _isEditing ? _selectedDate.hour : now.hour,
+        _isEditing ? _selectedDate.minute : now.minute,
       );
     });
   }
@@ -82,7 +115,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Transaction'),
+        title: Text(_isEditing ? 'Edit Transaction' : 'Add Transaction'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Form(
@@ -140,7 +173,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              key: ValueKey('category_$_isExpense'),
+              key: ValueKey('category_${_isExpense}_$_category'),
               initialValue: _category,
               decoration: const InputDecoration(
                 labelText: 'Category',
@@ -194,7 +227,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               key: const Key('save_transaction_button'),
               onPressed: _submit,
               icon: const Icon(Icons.check),
-              label: const Text('Save Transaction'),
+              label: Text(_isEditing ? 'Update Transaction' : 'Save Transaction'),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),

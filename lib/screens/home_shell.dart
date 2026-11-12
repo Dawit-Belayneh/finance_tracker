@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/sample_budgets.dart';
 import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
+import '../utils/transaction_actions.dart';
 import 'budgets_screen.dart';
 import 'dashboard_screen.dart';
 import 'reports_screen.dart';
@@ -46,6 +47,18 @@ class _HomeShellState extends State<HomeShell> {
     });
   }
 
+  void _updateTransaction(Transaction original, Transaction updated) {
+    setState(() {
+      replaceTransactionInList(_transactions, original, updated);
+    });
+  }
+
+  void _deleteTransaction(Transaction target) {
+    setState(() {
+      removeTransactionFromList(_transactions, target);
+    });
+  }
+
   void _updateMonthlyBudget(double amount) {
     setState(() {
       _monthlyBudget = amount;
@@ -73,11 +86,15 @@ class _HomeShellState extends State<HomeShell> {
           DashboardScreen(
             transactions: _transactions,
             onTransactionAdded: _addTransaction,
+            onTransactionUpdated: _updateTransaction,
+            onTransactionDeleted: _deleteTransaction,
             onSeeAllTransactions: () => setState(() => _selectedIndex = 1),
           ),
           TransactionsScreen(
             transactions: _transactions,
             onTransactionAdded: _addTransaction,
+            onTransactionUpdated: _updateTransaction,
+            onTransactionDeleted: _deleteTransaction,
           ),
           BudgetsScreen(
             transactions: _transactions,
