@@ -4,6 +4,7 @@ import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 import '../widgets/transaction_tile.dart';
+import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
 import 'transactions_screen.dart';
 
@@ -11,12 +12,12 @@ class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
     super.key,
     this.transactions,
-    this.onAddSampleExpense,
+    this.onTransactionAdded,
     this.onSeeAllTransactions,
   });
 
   final List<Transaction>? transactions;
-  final VoidCallback? onAddSampleExpense;
+  final ValueChanged<Transaction>? onTransactionAdded;
   final VoidCallback? onSeeAllTransactions;
 
   @override
@@ -53,24 +54,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return sorted.take(5).toList();
   }
 
-  // ---------- Demo action: proves the screen refreshes ----------
-  void _handleAddSampleExpense() {
-    if (widget.onAddSampleExpense != null) {
-      widget.onAddSampleExpense!();
-      return;
+  Future<void> _openAddTransaction() async {
+    final created = await Navigator.of(context).push<Transaction>(
+      MaterialPageRoute<Transaction>(
+        builder: (_) => const AddTransactionScreen(),
+      ),
+    );
+    if (created == null) return;
+
+    if (widget.onTransactionAdded != null) {
+      widget.onTransactionAdded!(created);
+    } else {
+      setState(() => _localTransactions.add(created));
     }
-    setState(() {
-      _localTransactions.add(
-        Transaction(
-          title: 'Coffee',
-          amount: 15,
-          isExpense: true,
-          category: 'Food',
-          date: DateTime.now(),
-          note: 'Quick coffee break',
-        ),
-      );
-    });
   }
 
   void _handleSeeAll() {
@@ -80,7 +76,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => TransactionsScreen(transactions: transactions),
+        builder: (_) => TransactionsScreen(
+          transactions: transactions,
+          onTransactionAdded: widget.onTransactionAdded ??
+              (t) => setState(() => _localTransactions.add(t)),
+        ),
       ),
     );
   }
@@ -152,7 +152,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _handleAddSampleExpense,
+        heroTag: 'dashboard_add_fab',
+        onPressed: _openAddTransaction,
         child: const Icon(Icons.add),
       ),
     );

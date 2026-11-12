@@ -27,18 +27,9 @@ class _HomeShellState extends State<HomeShell> {
     _transactions = List.of(widget.initialTransactions ?? sampleTransactions);
   }
 
-  void _addSampleExpense() {
+  void _addTransaction(Transaction transaction) {
     setState(() {
-      _transactions.add(
-        Transaction(
-          title: 'Coffee',
-          amount: 15,
-          isExpense: true,
-          category: 'Food',
-          date: DateTime.now(),
-          note: 'Quick coffee break',
-        ),
-      );
+      _transactions.add(transaction);
     });
   }
 
@@ -50,10 +41,13 @@ class _HomeShellState extends State<HomeShell> {
         children: [
           DashboardScreen(
             transactions: _transactions,
-            onAddSampleExpense: _addSampleExpense,
+            onTransactionAdded: _addTransaction,
             onSeeAllTransactions: () => setState(() => _selectedIndex = 1),
           ),
-          TransactionsScreen(transactions: _transactions),
+          TransactionsScreen(
+            transactions: _transactions,
+            onTransactionAdded: _addTransaction,
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(

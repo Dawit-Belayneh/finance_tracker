@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
 import '../widgets/transaction_tile.dart';
+import 'add_transaction_screen.dart';
 import 'transaction_detail_screen.dart';
 
 /// Filter options for the transactions list.
@@ -12,9 +13,11 @@ class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({
     super.key,
     required this.transactions,
+    this.onTransactionAdded,
   });
 
   final List<Transaction> transactions;
+  final ValueChanged<Transaction>? onTransactionAdded;
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
@@ -73,6 +76,21 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         builder: (_) => TransactionDetailScreen(transaction: transaction),
       ),
     );
+  }
+
+  Future<void> _openAddTransaction() async {
+    final created = await Navigator.of(context).push<Transaction>(
+      MaterialPageRoute<Transaction>(
+        builder: (_) => const AddTransactionScreen(),
+      ),
+    );
+    if (created == null) return;
+
+    if (widget.onTransactionAdded != null) {
+      widget.onTransactionAdded!(created);
+    } else {
+      setState(() => widget.transactions.add(created));
+    }
   }
 
   @override
@@ -223,6 +241,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'transactions_add_fab',
+        onPressed: _openAddTransaction,
+        child: const Icon(Icons.add),
       ),
     );
   }
