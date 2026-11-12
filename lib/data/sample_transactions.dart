@@ -1,0 +1,77 @@
+import '../models/transaction.dart';
+
+/// Initial sample transactions used until persistent storage or an API is added.
+final List<Transaction> sampleTransactions = [
+  Transaction(
+    title: 'Salary',
+    amount: 5000,
+    isExpense: false,
+    category: 'Salary',
+    date: DateTime(2026, 11, 1, 9, 0),
+    note: 'Monthly salary deposit',
+  ),
+  Transaction(
+    title: 'Groceries',
+    amount: 120,
+    isExpense: true,
+    category: 'Food',
+    date: DateTime(2026, 11, 3, 18, 15),
+    note: 'Weekly supermarket groceries',
+  ),
+  Transaction(
+    title: 'Taxi',
+    amount: 30,
+    isExpense: true,
+    category: 'Transport',
+    date: DateTime(2026, 11, 5, 14, 40),
+    note: 'Ride to downtown',
+  ),
+  Transaction(
+    title: 'Freelance design',
+    amount: 850,
+    isExpense: false,
+    category: 'Freelance',
+    date: DateTime(2026, 11, 6, 11, 30),
+    note: 'Landing page UI project',
+  ),
+  Transaction(
+    title: 'Electricity bill',
+    amount: 200,
+    isExpense: true,
+    category: 'Bills',
+    date: DateTime(2026, 11, 7, 10, 0),
+    note: 'Monthly utility statement',
+  ),
+  Transaction(
+    title: 'Restaurant',
+    amount: 80,
+    isExpense: true,
+    category: 'Food',
+    date: DateTime(2026, 11, 8, 20, 10),
+    note: 'Dinner with friends',
+  ),
+  Transaction(
+    title: 'Dividend payout',
+    amount: 145.50,
+    isExpense: false,
+    category: 'Investments',
+    date: DateTime(2026, 11, 9, 8, 30),
+    note: 'Quarterly ETF dividend',
+  ),
+  Transaction(
+    title: 'Internet plan',
+    amount: 55,
+    isExpense: true,
+    category: 'Bills',
+    date: DateTime(2026, 11, 10, 9, 15),
+    note: 'Fiber internet monthly bill',
+  ),
+  Transaction(
+    title: 'Metro pass',
+    amount: 45,
+    isExpense: true,
+    category: 'Transport',
+    date: DateTime(2026, 11, 11, 8, 0),
+    note: 'Monthly transit reload',
+  ),
+];

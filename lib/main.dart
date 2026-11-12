@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/home_shell.dart';
 
 void main() {
   runApp(const FinanceTrackerApp());
@@ -17,7 +17,7 @@ class FinanceTrackerApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const DashboardScreen(),
+      home: const HomeShell(),
     );
   }
 }

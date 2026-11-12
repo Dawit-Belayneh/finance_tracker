@@ -1,55 +1,33 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
-
-String money(double value) => '\$${value.toStringAsFixed(2)}';
+import '../utils/formatters.dart';
+import '../widgets/transaction_tile.dart';
+import 'transaction_detail_screen.dart';
+import 'transactions_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({
+    super.key,
+    this.transactions,
+    this.onAddSampleExpense,
+    this.onSeeAllTransactions,
+  });
+
+  final List<Transaction>? transactions;
+  final VoidCallback? onAddSampleExpense;
+  final VoidCallback? onSeeAllTransactions;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Fake data for now. Later this comes from storage or your API.
-  final List<Transaction> transactions = [
-    Transaction(
-      title: 'Salary',
-      amount: 5000,
-      isExpense: false,
-      category: 'Salary',
-      date: DateTime(2026, 11, 1),
-    ),
-    Transaction(
-      title: 'Groceries',
-      amount: 120,
-      isExpense: true,
-      category: 'Food',
-      date: DateTime(2026, 11, 3),
-    ),
-    Transaction(
-      title: 'Taxi',
-      amount: 30,
-      isExpense: true,
-      category: 'Transport',
-      date: DateTime(2026, 11, 5),
-    ),
-    Transaction(
-      title: 'Electricity bill',
-      amount: 200,
-      isExpense: true,
-      category: 'Bills',
-      date: DateTime(2026, 11, 7),
-    ),
-    Transaction(
-      title: 'Restaurant',
-      amount: 80,
-      isExpense: true,
-      category: 'Food',
-      date: DateTime(2026, 11, 8),
-    ),
-  ];
+  late final List<Transaction> _localTransactions = List.of(sampleTransactions);
+
+  List<Transaction> get transactions =>
+      widget.transactions ?? _localTransactions;
 
   // ---------- Calculations ----------
   double get totalIncome => transactions
@@ -76,18 +54,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ---------- Demo action: proves the screen refreshes ----------
-  void addSampleExpense() {
+  void _handleAddSampleExpense() {
+    if (widget.onAddSampleExpense != null) {
+      widget.onAddSampleExpense!();
+      return;
+    }
     setState(() {
-      transactions.add(
+      _localTransactions.add(
         Transaction(
           title: 'Coffee',
           amount: 15,
           isExpense: true,
           category: 'Food',
           date: DateTime.now(),
+          note: 'Quick coffee break',
         ),
       );
     });
+  }
+
+  void _handleSeeAll() {
+    if (widget.onSeeAllTransactions != null) {
+      widget.onSeeAllTransactions!();
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => TransactionsScreen(transactions: transactions),
+      ),
+    );
+  }
+
+  void _openDetails(Transaction transaction) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => TransactionDetailScreen(transaction: transaction),
+      ),
+    );
   }
 
   @override
@@ -126,16 +129,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 12),
           _chartCard(),
           const SizedBox(height: 16),
-          const Text(
-            'Recent transactions',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Recent transactions',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                onPressed: _handleSeeAll,
+                child: const Text('See all'),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          ...recent.map(_transactionTile),
+          ...recent.map(
+            (t) => TransactionTile(
+              transaction: t,
+              onTap: () => _openDetails(t),
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: addSampleExpense,
+        onPressed: _handleAddSampleExpense,
         child: const Icon(Icons.add),
       ),
     );
@@ -265,29 +282,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ],
-        ),
-      ),
-    );
-  }
-
-  // ---------- 4. One recent transaction ----------
-  Widget _transactionTile(Transaction t) {
-    final color = t.isExpense ? Colors.red : Colors.green;
-    final sign = t.isExpense ? '-' : '+';
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.15),
-          child: Icon(
-            t.isExpense ? Icons.arrow_upward : Icons.arrow_downward,
-            color: color,
-          ),
-        ),
-        title: Text(t.title),
-        subtitle: Text('${t.category} • ${t.date.day}/${t.date.month}/${t.date.year}'),
-        trailing: Text(
-          '$sign${money(t.amount)}',
-          style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
       ),
     );
