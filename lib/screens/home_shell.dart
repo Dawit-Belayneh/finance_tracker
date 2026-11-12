@@ -4,6 +4,7 @@ import '../data/sample_transactions.dart';
 import '../models/transaction.dart';
 import 'budgets_screen.dart';
 import 'dashboard_screen.dart';
+import 'reports_screen.dart';
 import 'transactions_screen.dart';
 
 /// Top-level navigation shell hosting Dashboard, Transactions, and Budgets.
@@ -86,6 +87,7 @@ class _HomeShellState extends State<HomeShell> {
             onCategoryBudgetSaved: _saveCategoryBudget,
             onCategoryBudgetRemoved: _removeCategoryBudget,
           ),
+          ReportsScreen(transactions: _transactions),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -106,6 +108,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.account_balance_wallet_outlined),
             selectedIcon: Icon(Icons.account_balance_wallet),
             label: 'Budgets',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
+            label: 'Reports',
           ),
         ],
       ),

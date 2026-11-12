@@ -43,6 +43,17 @@ String formatFullDate(DateTime date) =>
 String formatMonthYear(DateTime date) =>
     '${_fullMonthNames[date.month - 1]} ${date.year}';
 
+/// Formats a 7-day week starting at [weekStart] as `Mon D – Mon D, YYYY`.
+String formatWeekRange(DateTime weekStart) {
+  final end = weekStart.add(const Duration(days: 6));
+  final startLabel = '${_monthNames[weekStart.month - 1]} ${weekStart.day}';
+  final endLabel = '${_monthNames[end.month - 1]} ${end.day}';
+  if (weekStart.year != end.year) {
+    return '$startLabel, ${weekStart.year} – $endLabel, ${end.year}';
+  }
+  return '$startLabel – $endLabel, ${end.year}';
+}
+
 /// Formats the time portion of a [DateTime] in 12-hour format (e.g. `2:05 PM`).
 String formatTime(DateTime date) {
   final hour24 = date.hour;

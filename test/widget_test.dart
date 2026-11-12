@@ -76,4 +76,24 @@ void main() {
     // Sample Food spending is $200 + $100 = $300 of $300.
     expect(find.text('\$300.00 / \$300.00'), findsOneWidget);
   });
+
+  testWidgets('Reports tab displays income vs expenses summary',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const FinanceTrackerApp());
+
+    await tester.tap(find.text('Reports'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Income vs Expenses'), findsOneWidget);
+    final breakdownFinder = find.text('Category Breakdown');
+    await tester.scrollUntilVisible(
+      breakdownFinder,
+      200,
+      scrollable: find.descendant(
+        of: find.byType(IndexedStack),
+        matching: find.byType(Scrollable),
+      ).last,
+    );
+    expect(breakdownFinder, findsOneWidget);
+  });
 }
